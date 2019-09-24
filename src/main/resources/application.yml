@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.1.94:3306/dzy?useUnicode=true&characterEncoding=utf-8
+    username: zheng
+    password: 825IkO87
+server:
+  port: 8080
+#mybatis: map-underscore-to-camel-case: true申明数据库和实体类下划线自动匹配，     mapper-locations : classpath:mapper/*.xml申明sql语句放置在xml文件(空格讲究，位置讲究)
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    interceptors:
+
+  mapper-locations : classpath:mapper/*.xml
+  type-aliases-package: cn.zhengsigen.mybatis.demo.model
+logging:
+  level:
+    cn.zhengsigen.mybatis.demo.mapper : debug

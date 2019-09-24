@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <script src="//res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+    <script src="//cdn.bootcss.com/vConsole/3.3.3/vconsole.min.js"></script>
+
+</head>
+<body>
+<div>
+    回调
+    <script>
+        function order_notice() {
+            alert();
+            $xml = $GLOBALS['HTTP_RAW_POST_DATA'];
+            //将服务器返回的XML数据转化为数组
+            $data = $this - > FromXml($xml);
+            // 保存微信服务器返回的签名sign
+            $data_sign = $data['sign'];
+            // sign不参与签名算法
+            unset($data['sign']);
+            //$sign = self::makeSign($data);
+            $sign = $this - > makeSign($data);
+
+            Clog::setLog($data, 'order_notice');
+
+            // 判断签名是否正确  判断支付状态
+            if (($sign === $data_sign) && ($data['return_code'] == 'SUCCESS') && ($data['result_code'] == 'SUCCESS')) {
+                //获取服务器返回的数据
+                $order_num = $data['out_trade_no'];         //订单单号
+                $openid = $data['openid'];                  //付款人openID
+                $total_fee = $data['total_fee'];            //付款金额
+                $transaction_id = $data['transaction_id'];  //微信支付流水号
+                $res = $this - > order_notice_data_deal($order_num, $openid, $total_fee, $transaction_id);
+                if (!$res) {
+                    $result = -2;
+                } else {
+                    $result = 0;
+                }
+            } else {
+                $result = -1;
+            }
+            // 返回状态给微信服务器
+            if ($result == 0) { // 成功之后不会再回调
+                $str = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+            }
+            elseif($result == -1)
+            { // 失败后会继续发送几次回调
+                $str = '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[签名失败]]></return_msg></xml>';
+            }
+            elseif($result == -2)
+            { // 失败后会继续发送几次回调
+                $str = '<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[更改状态失败]]></return_msg></xml>';
+            }
+
+            Clog::setLog($result, 'order_notice_result');
+            exit($str);
+        }
+    </script>
+</div>
+</body>
+</html>

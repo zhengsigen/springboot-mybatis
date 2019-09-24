@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.zhengsigen.mybatis.demo.mapper.SellBookMapper">
+
+    <select id="getSellBookList" resultType="SellBook">
+        SELECT id, book_id, user_id, is_free, is_order, create_date, update_date
+	    FROM sell_books_tb
+     </select>
+    <select id="getSellBookListByUserId" resultType="Book">
+        SELECT id, isbn10, isbn13, name, cover, author, price, publisher, pub_date, douban_rate, gist, binding, create_date, update_date
+	    FROM books_tb where id in(select book_id from sell_books_tb where user_id = #{userId} and is_free = 0 and is_order=0)
+     </select>
+
+    <select id="getSellBookBySellBookIdAndUserId" resultType="SellBook">
+          SELECT id, book_id, user_id, is_free, is_order, create_date, update_date
+	        FROM sell_books_tb where book_id =#{sellBookId} and user_id = #{userId}
+     </select>
+
+    <insert id="addSellBook">
+        INSERT INTO sell_books_tb
+	        (book_id, user_id, is_free, is_order)
+	    VALUES (#{sellBookId}, #{userId}, 0, 0)
+    </insert>
+
+    <delete id="delSellBook">
+        DELETE FROM sell_books_tb WHERE book_id=#{bookId} and user_id=#{userId}
+    </delete>
+
+    <update id="sellBookWhetherInOrder" parameterType="java.util.List">
+        UPDATE sell_books_tb SET is_order=#{state} WHERE user_id=#{userId} and book_id in
+        <foreach collection="bookId" index="index" item="item" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+</mapper>

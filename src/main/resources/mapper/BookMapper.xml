@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.zhengsigen.mybatis.demo.mapper.BookMapper">
+
+    <select id="queryBookByIBSN" resultType="Book">
+        SELECT id, isbn10, isbn13, name, cover, author, price, publisher, pub_date, douban_rate, gist, binding, create_date, update_date
+	    FROM books_tb where isbn10= #{isbn} or isbn13 = #{isbn}
+    </select>
+
+    <insert id="addBook">
+        INSERT INTO books_tb
+	        (isbn10, isbn13, name, cover, author, price, publisher, pub_date, douban_rate, gist, binding)
+	    VALUES (#{ISBN10}, #{ISBN13},#{name},#{cover},#{author}, #{price}, #{publisher}, #{pubDate}, #{doubanRate}, #{gist}, #{binding})
+    </insert>
+
+</mapper>
